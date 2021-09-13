@@ -9,7 +9,7 @@ using namespace mymuduo;
 
 time_point Poller::poll(int timeoutMs, Poller::ChannelVec *activeChannels) {
   int numEvents = ::poll(&*pollfds_.begin(), pollfds_.size(), timeoutMs);
-  time_point now(std::chrono::system_clock::now());
+  time_point now(get_now());
   if (numEvents > 0) {
     LOG(INFO) << numEvents << " events happended";
     fillActiveChannels(numEvents, activeChannels);

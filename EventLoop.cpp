@@ -1,6 +1,7 @@
 #include "EventLoop.hpp"
 #include "Channel.hpp"
 #include "Poller.hpp"
+#include "TimerQueue.hpp"
 
 #include <glog/logging.h>
 #include <cassert>
@@ -15,7 +16,8 @@ EventLoop::EventLoop()
     : looping_(false),
       quit_(false),
       threadId_(std::this_thread::get_id()),
-      poller_(new Poller(this)) {
+      poller_(new Poller(this)),
+      timerQueue_(new TimerQueue(this)) {
   LOG(INFO) << "EventLoop created " << this << " in thread " << threadId_;
   if (t_loopInThisThread) {
     LOG(FATAL) << "Another EventLoop " << t_loopInThisThread
@@ -38,7 +40,7 @@ void EventLoop::loop() {
 
   while (!quit_) {
     activeChannels_.clear();
-    poller_->poll(kPollTimeMs, &activeChannels_);
+    pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
     for (const auto &channel: activeChannels_) {
       channel->handleEvent();
     }
@@ -50,6 +52,18 @@ void EventLoop::loop() {
 
 void EventLoop::quit() {
   quit_ = true;
+}
+
+TimerId EventLoop::runAt(const time_point &time, const TimerCallback &cb) {
+  return timerQueue_->addTimer(cb, time, 0.0);
+}
+
+TimerId EventLoop::runAfter(double delay, const TimerCallback &cb) {
+  return runAt(get_now() + to_microseconds(delay), cb);
+}
+
+TimerId EventLoop::runEvery(double interval, const TimerCallback &cb) {
+  return timerQueue_->addTimer(cb, get_now() + to_microseconds(interval), interval);
 }
 
 void EventLoop::updateChannel(Channel *channel) {

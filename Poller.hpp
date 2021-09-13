@@ -1,13 +1,11 @@
 #ifndef MYMUDUO__POLLER_HPP_
 #define MYMUDUO__POLLER_HPP_
 
-#include <chrono>
 #include <map>
 #include <vector>
 
 #include "EventLoop.hpp"
-
-using time_point = std::chrono::system_clock::time_point;
+#include "TimeUtil.hpp"
 
 struct pollfd;
 

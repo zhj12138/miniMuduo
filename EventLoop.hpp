@@ -4,11 +4,15 @@
 #include <thread>
 #include <vector>
 #include "noncopyable.hpp"
+#include "TimeUtil.hpp"
+#include "TimerId.hpp"
+#include "Callbacks.hpp"
 
 namespace mymuduo {
 
 class Channel;
 class Poller;
+class TimerQueue;
 
 class EventLoop : noncopyable {
  public:
@@ -18,6 +22,11 @@ class EventLoop : noncopyable {
   void loop();
 
   void quit();
+
+  time_point pollReturnTime() const { return pollReturnTime_; };
+  TimerId runAt(const time_point &time, const TimerCallback &cb);
+  TimerId runAfter(double delay, const TimerCallback &cb);
+  TimerId runEvery(double interval, const TimerCallback &cb);
 
   // internal use only
   void updateChannel(Channel *channel);
@@ -38,7 +47,9 @@ class EventLoop : noncopyable {
   bool looping_;  // atomic
   bool quit_;     // atomic
   const std::thread::id threadId_;
+  time_point pollReturnTime_;
   std::unique_ptr<Poller> poller_;
+  std::unique_ptr<TimerQueue> timerQueue_;
   ChannelVec activeChannels_;
 };
 
