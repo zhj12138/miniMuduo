@@ -7,8 +7,13 @@ find_package(glog 0.6.0 REQUIRED)
 
 add_library(myMuduo
         STATIC
+        noncopyable.hpp
         EventLoop.cpp
         EventLoop.hpp
+        Channel.cpp
+        Channel.hpp
+        Poller.cpp
+        Poller.hpp
         )
 target_link_libraries(myMuduo glog::glog)
 
@@ -17,3 +22,6 @@ target_link_libraries(test1 myMuduo)
 
 add_executable(test2 test2.cpp)
 target_link_libraries(test2 myMuduo)
+
+add_executable(test3 test3.cpp)
+target_link_libraries(test3 myMuduo)
