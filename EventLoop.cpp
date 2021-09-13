@@ -10,7 +10,7 @@ thread_local EventLoop *t_loopInThisThread = nullptr;
 EventLoop::EventLoop()
     : looping_(false),
       threadId_(std::this_thread::get_id()) {
-  LOG(INFO) << "EventLoop created " << this << " int thread " << threadId_;
+  LOG(INFO) << "EventLoop created " << this << " in thread " << threadId_;
   if (t_loopInThisThread) {
     LOG(FATAL) << "Another EventLoop " << t_loopInThisThread
                << " exists in this thread " << threadId_;
@@ -30,6 +30,7 @@ void EventLoop::loop() {
   looping_ = true;
   ::poll(nullptr, 0, 5 * 1000);
   LOG(INFO) << "EventLoop " << this << " stop looping";
+  looping_ = false;
 }
 
 void EventLoop::abortNotInLoopThread() {
