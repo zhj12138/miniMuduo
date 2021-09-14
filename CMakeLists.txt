@@ -35,6 +35,10 @@ add_library(myMuduo
         src/Socket.hpp
         src/Acceptor.cpp
         src/Acceptor.hpp
+        src/TcpConnection.cpp
+        src/TcpConnection.hpp
+        src/TcpServer.cpp
+        src/TcpServer.hpp
         )
 target_link_libraries(myMuduo glog::glog)
 
@@ -63,3 +67,6 @@ target_link_libraries(test6 myMuduo)
 
 add_executable(test7 tests/test7.cpp)
 target_link_libraries(test7 myMuduo)
+
+add_executable(test8 tests/test8.cpp)
+target_link_libraries(test8 myMuduo)
