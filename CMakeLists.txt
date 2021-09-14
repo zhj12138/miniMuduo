@@ -29,8 +29,12 @@ add_library(myMuduo
         src/TimerQueue.hpp
         src/SocketsOps.cpp
         src/SocketsOps.hpp
+        src/InetAddress.cpp
+        src/InetAddress.hpp
         src/Socket.cpp
         src/Socket.hpp
+        src/Acceptor.cpp
+        src/Acceptor.hpp
         )
 target_link_libraries(myMuduo glog::glog)
 
@@ -56,3 +60,6 @@ target_link_libraries(test5 myMuduo)
 
 add_executable(test6 tests/test6.cpp)
 target_link_libraries(test6 myMuduo)
+
+add_executable(test7 tests/test7.cpp)
+target_link_libraries(test7 myMuduo)

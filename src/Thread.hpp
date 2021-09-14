@@ -1,5 +1,5 @@
-#ifndef MYMUDUO_SRC_THREAD_HPP_
-#define MYMUDUO_SRC_THREAD_HPP_
+#ifndef MYMUDUO__THREAD_HPP_
+#define MYMUDUO__THREAD_HPP_
 
 #include <future>
 #include <thread>
@@ -21,4 +21,4 @@ class Thread {
 };
 
 }
-#endif //MYMUDUO_SRC_THREAD_HPP_
+#endif //MYMUDUO__THREAD_HPP_
