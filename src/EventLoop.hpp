@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <vector>
+#include <mutex>
 #include "noncopyable.hpp"
 #include "TimeUtil.hpp"
 #include "TimerId.hpp"
@@ -16,6 +17,8 @@ class TimerQueue;
 
 class EventLoop : noncopyable {
  public:
+  using Functor = std::function<void ()>;
+
   EventLoop();
   ~EventLoop();
 
@@ -24,11 +27,16 @@ class EventLoop : noncopyable {
   void quit();
 
   time_point pollReturnTime() const { return pollReturnTime_; };
+
+  void runInLoop(const Functor &cb);
+  void queueInLoop(const Functor &cb);
+
   TimerId runAt(const time_point &time, const TimerCallback &cb);
   TimerId runAfter(double delay, const TimerCallback &cb);
   TimerId runEvery(double interval, const TimerCallback &cb);
 
   // internal use only
+  void wakeup() const;
   void updateChannel(Channel *channel);
 
   bool isInLoopThread() const {
@@ -41,16 +49,23 @@ class EventLoop : noncopyable {
   }
  private:
   void abortNotInLoopThread();
+  void handleRead() const;  // waked up
+  void doPendingFunctors();
 
   using ChannelVec = std::vector<Channel *>;
 
   bool looping_;  // atomic
   bool quit_;     // atomic
+  bool callingPendingFunctors_; // atomic
   const std::thread::id threadId_;
   time_point pollReturnTime_;
   std::unique_ptr<Poller> poller_;
   std::unique_ptr<TimerQueue> timerQueue_;
+  int wakeupFd_;
+  std::unique_ptr<Channel> wakeupChannel_;
   ChannelVec activeChannels_;
+  std::mutex mutex_;
+  std::vector<Functor> pendingFunctors_;  // @Guarded by mutex
 };
 
 }

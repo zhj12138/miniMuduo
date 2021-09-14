@@ -1,5 +1,6 @@
-#include "../src/EventLoop.hpp"
+#include "EventLoop.hpp"
 #include <iostream>
+#include <unistd.h>
 
 void threadFunc() {
   std::cout << "threadFunc(): pid = " << getpid()

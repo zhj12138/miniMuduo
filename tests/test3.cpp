@@ -1,5 +1,5 @@
-#include "../src/Channel.hpp"
-#include "../src/EventLoop.hpp"
+#include "Channel.hpp"
+#include "EventLoop.hpp"
 
 #include <iostream>
 #include <sys/timerfd.h>

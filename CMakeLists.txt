@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(myMuduo)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "-pthread")
 
 find_package(glog 0.6.0 REQUIRED)
 
@@ -10,8 +11,12 @@ add_library(myMuduo
         src/noncopyable.hpp
         src/TimeUtil.cpp
         src/TimeUtil.hpp
+        src/Thread.cpp
+        src/Thread.hpp
         src/EventLoop.cpp
         src/EventLoop.hpp
+        src/EventLoopThread.cpp
+        src/EventLoopThread.hpp
         src/Channel.cpp
         src/Channel.hpp
         src/Poller.cpp
@@ -22,8 +27,14 @@ add_library(myMuduo
         src/TimerId.hpp
         src/TimerQueue.cpp
         src/TimerQueue.hpp
+        src/SocketsOps.cpp
+        src/SocketsOps.hpp
+        src/Socket.cpp
+        src/Socket.hpp
         )
 target_link_libraries(myMuduo glog::glog)
+
+include_directories(src)
 
 add_executable(test1 tests/test1.cpp)
 target_link_libraries(test1 myMuduo)
@@ -36,3 +47,12 @@ target_link_libraries(test3 myMuduo)
 
 add_executable(test4 tests/test4.cpp)
 target_link_libraries(test4 myMuduo)
+
+add_executable(testThread tests/testThread.cpp src/TimeUtil.cpp)
+target_link_libraries(testThread pthread)
+
+add_executable(test5 tests/test5.cpp)
+target_link_libraries(test5 myMuduo)
+
+add_executable(test6 tests/test6.cpp)
+target_link_libraries(test6 myMuduo)

@@ -1,0 +1,8 @@
+#ifndef MYMUDUO_SRC_SOCKETSOPS_HPP_
+#define MYMUDUO_SRC_SOCKETSOPS_HPP_
+
+class SocketsOps {
+
+};
+
+#endif //MYMUDUO_SRC_SOCKETSOPS_HPP_
