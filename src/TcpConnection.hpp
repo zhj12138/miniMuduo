@@ -32,12 +32,19 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   void setMessageCallback(const MessageCallback &cb) {
     messageCallback_ = cb;
   }
+  void setCloseCallback(const CloseCallback &cb) {
+    closeCallback_ = cb;
+  }
   void connectEstablished();  // should be called only once
+  void connectDestroyed();
  private:
-  enum StateE { kConnecting, kConnected, };
+  enum StateE { kConnecting, kConnected, kDisconnected, };
 
   void setState(StateE s) { state_ = s; }
   void handleRead();
+  void handleWrite();
+  void handleClose();
+  void handleError();
 
   EventLoop *loop_;
   std::string name_;
@@ -48,6 +55,7 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   InetAddress peerAddr_;
   ConnectionCallback connectionCallback_;
   MessageCallback messageCallback_;
+  CloseCallback closeCallback_;
 };
 
 }

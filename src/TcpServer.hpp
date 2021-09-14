@@ -28,6 +28,7 @@ class TcpServer : noncopyable {
 
  private:
   void newConnection(int sockfd, const InetAddress &peerAddr);
+  void removeConnection(const TcpConnectionPtr &conn);
 
   using ConnectionMap = std::map<std::string, TcpConnectionPtr>;
 

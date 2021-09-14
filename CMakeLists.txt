@@ -11,6 +11,7 @@ add_library(myMuduo
         src/noncopyable.hpp
         src/TimeUtil.cpp
         src/TimeUtil.hpp
+        src/Cast.hpp
         src/Thread.cpp
         src/Thread.hpp
         src/EventLoop.cpp

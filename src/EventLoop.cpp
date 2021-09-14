@@ -1,4 +1,5 @@
 #include "EventLoop.hpp"
+
 #include "Channel.hpp"
 #include "Poller.hpp"
 #include "TimerQueue.hpp"
@@ -108,6 +109,12 @@ void EventLoop::updateChannel(Channel *channel) {
   assert(channel->ownerLoop() == this);
   assertInLoopThread();
   poller_->updateChannel(channel);
+}
+
+void EventLoop::removeChannel(Channel *channel) {
+  assert(channel->ownerLoop() == this);
+  assertInLoopThread();
+  poller_->removeChannel(channel);
 }
 
 void EventLoop::abortNotInLoopThread() {

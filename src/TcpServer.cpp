@@ -4,6 +4,7 @@
 #include "EventLoop.hpp"
 #include "SocketsOps.hpp"
 
+#include <cassert>
 #include <glog/logging.h>
 #include <cstdio>
 
@@ -24,8 +25,7 @@ TcpServer::TcpServer(EventLoop *loop, const InetAddress &listenAddr)
   });
 }
 
-TcpServer::~TcpServer() {
-}
+TcpServer::~TcpServer() = default;
 
 void TcpServer::start() {
   if (!started_) {
@@ -50,6 +50,17 @@ void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
   connections_[connName] = conn;
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
+  conn->setCloseCallback([this](auto &&PH1) { removeConnection(std::forward<decltype(PH1)>(PH1)); });
   conn->connectEstablished();
+}
+
+void TcpServer::removeConnection(const TcpConnectionPtr &conn) {
+  loop_->assertInLoopThread();
+  LOG(INFO) << "TcpServer::removeConnection [" << name_
+            << "] - connection " << conn->name();
+  size_t n = connections_.erase(conn->name());
+  assert(n == 1);
+  (void) n;
+  loop_->queueInLoop([conn] { conn->connectDestroyed(); });
 }
 

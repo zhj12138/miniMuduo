@@ -12,6 +12,7 @@ class Channel : noncopyable {
  public:
   using EventCallback = std::function<void()>;
   Channel(EventLoop *loop, int fd);
+  ~Channel();
 
   void handleEvent();
   void setReadCallback(const EventCallback &cb) {
@@ -22,6 +23,9 @@ class Channel : noncopyable {
   }
   void setErrorCallback(const EventCallback &cb) {
     errorCallback_ = cb;
+  }
+  void setCloseCallback(const EventCallback &cb) {
+    closeCallback_ = cb;
   }
 
   int fd() const { return fd_; }
@@ -63,9 +67,12 @@ class Channel : noncopyable {
   int revents_;
   int index_;
 
+  bool eventHandling_;
+
   EventCallback readCallback_;
   EventCallback writeCallback_;
   EventCallback errorCallback_;
+  EventCallback closeCallback_;
 };
 
 }

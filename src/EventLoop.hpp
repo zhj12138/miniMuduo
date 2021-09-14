@@ -38,6 +38,7 @@ class EventLoop : noncopyable {
   // internal use only
   void wakeup() const;
   void updateChannel(Channel *channel);
+  void removeChannel(Channel *channel);
 
   bool isInLoopThread() const {
     return threadId_ == std::this_thread::get_id();

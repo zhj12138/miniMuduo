@@ -1,10 +1,11 @@
 #include "SocketsOps.hpp"
 
+#include "Cast.hpp"
+
 #include <glog/logging.h>
 #include <cerrno>
 #include <fcntl.h>
-#include <sys/socket.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 
 using namespace mymuduo;
@@ -12,11 +13,6 @@ using namespace mymuduo;
 namespace {
 
 using SA = struct sockaddr;
-
-template<typename To, typename From>
-inline To implicit_cast(From const &f) {
-  return f;
-}
 
 const SA *sockaddr_cast(const struct sockaddr_in *addr) {
   return static_cast<const SA *>(implicit_cast<const void *>(addr));
@@ -142,4 +138,14 @@ struct sockaddr_in sockets::getLocalAddr(int sockfd) {
     LOG(ERROR) << "sockets::getLocalAddr";
   }
   return localaddr;
+}
+
+int sockets::getSocketError(int sockfd) {
+  int optval;
+  socklen_t optlen = sizeof(optval);
+  if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0) {
+    return errno;
+  } else {
+    return optval;
+  }
 }

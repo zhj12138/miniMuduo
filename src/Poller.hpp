@@ -23,6 +23,7 @@ class Poller : noncopyable {
   time_point poll(int timeoutMs, ChannelVec *activeChannels);
 
   void updateChannel(Channel *channel);
+  void removeChannel(Channel *channel);
 
   void assertInLoopThread() {}
  private:
