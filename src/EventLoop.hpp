@@ -35,6 +35,8 @@ class EventLoop : noncopyable {
   TimerId runAfter(double delay, const TimerCallback &cb);
   TimerId runEvery(double interval, const TimerCallback &cb);
 
+  void cancel(TimerId timerId);
+
   // internal use only
   void wakeup() const;
   void updateChannel(Channel *channel);

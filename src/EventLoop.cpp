@@ -115,6 +115,10 @@ TimerId EventLoop::runEvery(double interval, const TimerCallback &cb) {
   return timerQueue_->addTimer(cb, get_now() + to_microseconds(interval), interval);
 }
 
+void EventLoop::cancel(TimerId timerId) {
+  return timerQueue_->cancel(timerId);
+}
+
 void EventLoop::updateChannel(Channel *channel) {
   assert(channel->ownerLoop() == this);
   assertInLoopThread();
@@ -156,7 +160,7 @@ void EventLoop::doPendingFunctors() {
     std::lock_guard<std::mutex> lg(mutex_);
     functors.swap(pendingFunctors_);
   }
-  LOG(INFO) << functors.size() << " pending function(s) going to be called\n";
+//  LOG(INFO) << functors.size() << " pending function(s) going to be called\n";
   for (auto &functor : functors) {
     functor();
   }

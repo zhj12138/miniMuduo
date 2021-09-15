@@ -22,12 +22,17 @@ class TimerQueue : noncopyable {
 
   TimerId addTimer(const TimerCallback &cb, time_point when, double interval);
 
+  void cancel(TimerId timerId);
+
  private:
   using Entry = std::pair<time_point, Timer *>;
   using TimerSet = std::set<Entry>;
   using EntryVec = std::vector<Entry>;
+  using ActiveTimer = std::pair<Timer *, int64_t>;
+  using ActiveTimerSet = std::set<ActiveTimer>;
 
   void addTimerInLoop(Timer *timer);
+  void cancelInLoop(TimerId timerId);
   void handleRead(time_point receiveTime);  // called when timerfd alarms
   EntryVec getExpired(time_point now);  // move out all expired timers
   void reset(const EntryVec &expired, time_point now);
@@ -38,6 +43,11 @@ class TimerQueue : noncopyable {
   const int timerfd_;
   Channel timerfdChannel_;
   TimerSet timers_;
+
+  // for cancel()
+  bool callingExpiredTimers_;
+  ActiveTimerSet activeTimers_;
+  ActiveTimerSet cancelingTimers_;
 };
 
 }

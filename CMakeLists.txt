@@ -44,6 +44,8 @@ add_library(myMuduo
         src/TcpConnection.hpp
         src/TcpServer.cpp
         src/TcpServer.hpp
+        src/Connector.cpp
+        src/Connector.hpp
         )
 target_link_libraries(myMuduo glog::glog)
 
