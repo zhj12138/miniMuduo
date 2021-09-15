@@ -101,6 +101,7 @@ void Connector::connecting(int sockfd) {
   channel_ = std::make_unique<Channel>(loop_, sockfd);
   channel_->setWriteCallback([this] { handleWrite(); });
   channel_->setErrorCallback([this] { handleError(); });
+  channel_->enableWriting();
 }
 
 int Connector::removeAndResetChannel() {

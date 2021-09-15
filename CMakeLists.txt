@@ -46,6 +46,8 @@ add_library(myMuduo
         src/TcpServer.hpp
         src/Connector.cpp
         src/Connector.hpp
+        src/TcpClient.cpp
+        src/TcpClient.hpp
         )
 target_link_libraries(myMuduo glog::glog)
 
@@ -86,3 +88,9 @@ target_link_libraries(test10 myMuduo)
 
 add_executable(test11 tests/test11.cpp)
 target_link_libraries(test11 myMuduo)
+
+add_executable(test12 tests/test12.cpp)
+target_link_libraries(test12 myMuduo)
+
+add_executable(test13 tests/test13.cpp)
+target_link_libraries(test13 myMuduo)

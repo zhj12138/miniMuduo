@@ -25,7 +25,7 @@ void onMessage(const mymuduo::TcpConnectionPtr &conn,
 }
 
 int main(int argc, char *argv[]) {
-  std::cout << "main(): pid = %d\n" << getpid();
+  std::cout << "main(): pid = " << getpid() << "\n";
   mymuduo::InetAddress listenAddr(9987);
   mymuduo::EventLoop loop;
   mymuduo::TcpServer server(&loop, listenAddr);

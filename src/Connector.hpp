@@ -29,6 +29,7 @@ class Connector : noncopyable {
   void stop();
 
   const InetAddress &serverAddress() const { return serverAddr_; }
+
  private:
   enum States { kDisconnected, kConnecting, kConnected };
   static const int kMaxRetryDelayMs = 30 * 1000;
@@ -53,6 +54,8 @@ class Connector : noncopyable {
   int retryDelayMs_;
   TimerId timerId_;
 };
+
+using ConnectorPtr = std::shared_ptr<Connector>;
 
 }
 #endif //MYMUDUO__CONNECTOR_HPP_
