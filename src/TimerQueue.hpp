@@ -28,7 +28,7 @@ class TimerQueue : noncopyable {
   using EntryVec = std::vector<Entry>;
 
   void addTimerInLoop(Timer *timer);
-  void handleRead();  // called when timerfd alarms
+  void handleRead(time_point receiveTime);  // called when timerfd alarms
   EntryVec getExpired(time_point now);  // move out all expired timers
   void reset(const EntryVec &expired, time_point now);
 

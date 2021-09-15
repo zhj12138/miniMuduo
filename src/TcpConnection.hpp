@@ -4,6 +4,7 @@
 #include "Callbacks.hpp"
 #include "InetAddress.hpp"
 #include "noncopyable.hpp"
+#include "Buffer.hpp"
 
 namespace mymuduo {
 
@@ -41,7 +42,7 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   enum StateE { kConnecting, kConnected, kDisconnected, };
 
   void setState(StateE s) { state_ = s; }
-  void handleRead();
+  void handleRead(time_point receiveTime);
   void handleWrite();
   void handleClose();
   void handleError();
@@ -56,6 +57,7 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   ConnectionCallback connectionCallback_;
   MessageCallback messageCallback_;
   CloseCallback closeCallback_;
+  Buffer inputBuffer_;
 };
 
 }

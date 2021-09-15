@@ -61,7 +61,7 @@ TimerQueue::TimerQueue(EventLoop *loop)
       timerfd_(createTimerfd()),
       timerfdChannel_(loop, timerfd_),
       timers_() {
-  timerfdChannel_.setReadCallback([this] { handleRead(); });
+  timerfdChannel_.setReadCallback([this](auto &&PH1) { handleRead(std::forward<decltype(PH1)>(PH1)); });
   timerfdChannel_.enableReading();
 }
 
@@ -86,7 +86,7 @@ void TimerQueue::addTimerInLoop(Timer *timer) {
   }
 }
 
-void TimerQueue::handleRead() {
+void TimerQueue::handleRead(time_point _receiveTime) {
   loop_->assertInLoopThread();
   time_point now(get_now());
   readTimerfd(timerfd_, now);

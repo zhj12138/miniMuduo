@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "noncopyable.hpp"
+#include "TimeUtil.hpp"
 
 namespace mymuduo {
 
@@ -11,11 +12,13 @@ class EventLoop;
 class Channel : noncopyable {
  public:
   using EventCallback = std::function<void()>;
+  using ReadEventCallback = std::function<void(time_point)>;
+
   Channel(EventLoop *loop, int fd);
   ~Channel();
 
-  void handleEvent();
-  void setReadCallback(const EventCallback &cb) {
+  void handleEvent(time_point receiveTime);
+  void setReadCallback(const ReadEventCallback &cb) {
     readCallback_ = cb;
   }
   void setWriteCallback(const EventCallback &cb) {
@@ -69,7 +72,7 @@ class Channel : noncopyable {
 
   bool eventHandling_;
 
-  EventCallback readCallback_;
+  ReadEventCallback readCallback_;
   EventCallback writeCallback_;
   EventCallback errorCallback_;
   EventCallback closeCallback_;

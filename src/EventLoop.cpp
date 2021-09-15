@@ -39,7 +39,7 @@ EventLoop::EventLoop()
   } else {
     t_loopInThisThread = this;
   }
-  wakeupChannel_->setReadCallback([this] { handleRead(); });
+  wakeupChannel_->setReadCallback([this](auto &&PH1) { handleRead(std::forward<decltype(PH1)>(PH1)); });
   wakeupChannel_->enableReading();
 }
 
@@ -59,7 +59,7 @@ void EventLoop::loop() {
     activeChannels_.clear();
     pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
     for (const auto &channel: activeChannels_) {
-      channel->handleEvent();
+      channel->handleEvent(pollReturnTime_);
     }
     doPendingFunctors();
   }
@@ -131,7 +131,7 @@ void EventLoop::wakeup() const {
   }
 }
 
-void EventLoop::handleRead() const {
+void EventLoop::handleRead(time_point _receiveTime) const {
   uint64_t one = 1;
   ssize_t n = ::read(wakeupFd_, &one, sizeof(one));
   if (n != sizeof(one)) {

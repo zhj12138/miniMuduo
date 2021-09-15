@@ -13,7 +13,7 @@ Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr)
       listenning_(false) {
   acceptSocket_.setReuseAddr(true);
   acceptSocket_.bindAddress(listenAddr);
-  acceptChannel_.setReadCallback([this] { handleRead(); });
+  acceptChannel_.setReadCallback([this](auto &&PH1) { handleRead(std::forward<decltype(PH1)>(PH1)); });
 }
 
 void Acceptor::listen() {
@@ -23,7 +23,7 @@ void Acceptor::listen() {
   acceptChannel_.enableReading();
 }
 
-void Acceptor::handleRead() {
+void Acceptor::handleRead(time_point _receiveTime) {
   loop_->assertInLoopThread();
   InetAddress peerAddr(0);
   int connfd = acceptSocket_.accept(&peerAddr);

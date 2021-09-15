@@ -8,8 +8,8 @@
 
 mymuduo::EventLoop *g_loop;
 
-void timeout() {
-  std::cout << "Timeout!\n";
+void timeout(mymuduo::time_point receiveTime) {
+  std::cout << mymuduo::to_string(receiveTime) << " Timeout!\n";
   g_loop->quit();
 }
 
