@@ -36,3 +36,7 @@ void Socket::setReuseAddr(bool on) {
     // TODO: specify through errno
   }
 }
+
+void Socket::shutdownWrite() {
+  sockets::shutdownWrite(sockfd_);
+}

@@ -53,6 +53,8 @@ class Channel : noncopyable {
     update();
   }
 
+  bool isWriting() const { return events_ & kWriteEvent; }
+
   int index() const { return index_; }
   void set_index(int idx) { index_ = idx; }
 
