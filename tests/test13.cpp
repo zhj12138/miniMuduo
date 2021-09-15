@@ -3,7 +3,6 @@
 #include "TcpClient.hpp"
 
 #include <iostream>
-#include <unistd.h>
 
 std::string message = "Hello\n";
 

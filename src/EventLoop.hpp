@@ -13,7 +13,10 @@ namespace mymuduo {
 
 class Channel;
 class Poller;
+class EPoller;
 class TimerQueue;
+
+using PollerImpl = EPoller;
 
 class EventLoop : noncopyable {
  public:
@@ -62,7 +65,7 @@ class EventLoop : noncopyable {
   bool callingPendingFunctors_; // atomic
   const std::thread::id threadId_;
   time_point pollReturnTime_;
-  std::unique_ptr<Poller> poller_;
+  std::unique_ptr<PollerImpl> poller_;
   std::unique_ptr<TimerQueue> timerQueue_;
   int wakeupFd_;
   std::unique_ptr<Channel> wakeupChannel_;

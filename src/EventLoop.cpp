@@ -2,6 +2,7 @@
 
 #include "Channel.hpp"
 #include "Poller.hpp"
+#include "EPoller.hpp"
 #include "TimerQueue.hpp"
 
 #include <glog/logging.h>
@@ -38,7 +39,7 @@ EventLoop::EventLoop()
       quit_(false),
       callingPendingFunctors_(false),
       threadId_(std::this_thread::get_id()),
-      poller_(new Poller(this)),
+      poller_(new PollerImpl(this)),
       timerQueue_(new TimerQueue(this)),
       wakeupFd_(createEventfd()),
       wakeupChannel_(new Channel(this, wakeupFd_)) {

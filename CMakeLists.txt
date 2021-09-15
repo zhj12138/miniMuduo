@@ -26,6 +26,8 @@ add_library(myMuduo
         src/Channel.hpp
         src/Poller.cpp
         src/Poller.hpp
+        src/EPoller.cpp
+        src/EPoller.hpp
         src/Callbacks.hpp
         src/Timer.cpp
         src/Timer.hpp
