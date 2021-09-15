@@ -2,33 +2,29 @@
 #include "EventLoop.hpp"
 #include "InetAddress.hpp"
 
-#include <cstdio>
+#include <iostream>
 #include <unistd.h>
 
 void onConnection(const mymuduo::TcpConnectionPtr &conn) {
   if (conn->connected()) {
-    printf("onConnection(): new connection [%s] from %s\n",
-           conn->name().c_str(),
-           conn->peerAddress().toHostPort().c_str());
+    std::cout << "onConnection(): tid=" << std::this_thread::get_id() << " new connection [" << conn->name()
+              << "]  from " << conn->peerAddress().toHostPort() << "\n";
   } else {
-    printf("onConnection(): connection [%s] is down\n",
-           conn->name().c_str());
+    std::cout << "onConnection(): tid=" << std::this_thread::get_id() << " connection [" << conn->name()
+              << "] is done\n";
   }
 }
 
 void onMessage(const mymuduo::TcpConnectionPtr &conn,
                mymuduo::Buffer *buf,
                mymuduo::time_point receiveTime) {
-  printf("onMessage(): received %zd bytes from connection [%s] at %s\n",
-         buf->readableBytes(),
-         conn->name().c_str(),
-         mymuduo::to_string(receiveTime).c_str());
-
-  printf("onMessage(): [%s]\n", buf->retrieveAsString().c_str());
+  std::cout << "onMessage(): tid=" << std::this_thread::get_id() << " received " << buf->readableBytes() << " bytes from connection ["
+            << conn->name() << "] at " << mymuduo::to_string(receiveTime) << "\n";
+  std::cout << "onMessage(): [" << buf->retrieveAsString() << "]\n";
 }
 
-int main() {
-  printf("main(): pid = %d\n", getpid());
+int main(int argc, char *argv[]) {
+  std::cout << "main(): pid = " << getpid() << "\n";
 
   mymuduo::InetAddress listenAddr(9987);
   mymuduo::EventLoop loop;
@@ -36,6 +32,9 @@ int main() {
   mymuduo::TcpServer server(&loop, listenAddr);
   server.setConnectionCallback(onConnection);
   server.setMessageCallback(onMessage);
+  if (argc > 1) {
+    server.setThreadNum(atoi(argv[1]));
+  }
   server.start();
 
   loop.loop();

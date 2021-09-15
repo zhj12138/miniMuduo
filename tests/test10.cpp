@@ -5,20 +5,16 @@
 #include <unistd.h>
 
 std::string message1, message2;
-int sleepSeconds = 0;
 
 void onConnection(const mymuduo::TcpConnectionPtr &conn) {
   if (conn->connected()) {
-    std::cout << "onConnection: new connection [" << conn->name()
+    std::cout << "onConnection: tid=" << std::this_thread::get_id() << " new connection [" << conn->name()
               << "] from " << conn->peerAddress().toHostPort() << "\n";
-    if (sleepSeconds > 0) {
-      ::sleep(sleepSeconds);
-    }
-    conn->send(message1);
-    conn->send(message2);
+    if (!message1.empty()) conn->send(message1);
+    if (!message2.empty()) conn->send(message2);
     conn->shutdown();
   } else {
-    std::cout << "onConnection: connection [" << conn->name()
+    std::cout << "onConnection: tid=" << std::this_thread::get_id() << " connection [" << conn->name()
               << "] is done\n";
   }
 }
@@ -26,7 +22,8 @@ void onConnection(const mymuduo::TcpConnectionPtr &conn) {
 void onMessage(const mymuduo::TcpConnectionPtr &conn,
                mymuduo::Buffer *buf,
                mymuduo::time_point receiveTime) {
-  std::cout << "onMessage(): received " << buf->readableBytes() << " bytes from connection ["
+  std::cout << "onMessage(): tid=" << std::this_thread::get_id() << " received " << buf->readableBytes()
+            << " bytes from connection ["
             << conn->name() << "] at " << mymuduo::to_string(receiveTime) << "\n";
 //  conn->send(buf->retrieveAsString());
   buf->retrieveAll();
@@ -44,15 +41,15 @@ int main(int argc, char *argv[]) {
   message2.resize(len2);
   std::fill(message1.begin(), message1.end(), 'A');
   std::fill(message2.begin(), message2.end(), 'B');
-  if (argc > 3) {
-    sleepSeconds = atoi(argv[3]);
-  }
 
   mymuduo::InetAddress listenAddr(9987);
   mymuduo::EventLoop loop;
   mymuduo::TcpServer server(&loop, listenAddr);
   server.setConnectionCallback(onConnection);
   server.setMessageCallback(onMessage);
+  if (argc > 3) {
+    server.setThreadNum(atoi(argv[3]));
+  }
   server.start();
   loop.loop();
   return 0;

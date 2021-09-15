@@ -20,6 +20,8 @@ add_library(myMuduo
         src/EventLoop.hpp
         src/EventLoopThread.cpp
         src/EventLoopThread.hpp
+        src/EventLoopThreadPool.cpp
+        src/EventLoopThreadPool.hpp
         src/Channel.cpp
         src/Channel.hpp
         src/Poller.cpp
