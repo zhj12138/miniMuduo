@@ -55,6 +55,10 @@ void TcpConnection::shutdown() {
   }
 }
 
+void TcpConnection::setTcpNoDelay(bool on) {
+  socket_->setTcpNoDelay(on);
+}
+
 void TcpConnection::connectEstablished() {
   loop_->assertInLoopThread();
   assert(state_ == kConnecting);
@@ -94,6 +98,9 @@ void TcpConnection::handleWrite() {
       outputBuffer_.retrieve(n);
       if (outputBuffer_.readableBytes() == 0) {
         channel_->disableWriting();
+        if (writeCompleteCallback_) {
+          loop_->queueInLoop([this] { writeCompleteCallback_(shared_from_this()); });
+        }
         if (state_ == kDisconnecting) {
           shutdownInLoop();
         }
@@ -130,6 +137,8 @@ void TcpConnection::sendInLoop(const std::string &message) {
     if (nwrote >= 0) {
       if (implicit_cast<size_t>(nwrote) < message.size()) {
         LOG(INFO) << "I am going to write more data";
+      } else if (writeCompleteCallback_) {
+        loop_->queueInLoop([this] { writeCompleteCallback_(shared_from_this()); });
       }
     } else {
       nwrote = 0;

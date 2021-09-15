@@ -29,12 +29,16 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
 
   void send(const std::string &message);
   void shutdown();
+  void setTcpNoDelay(bool on);
 
   void setConnectionCallback(const ConnectionCallback &cb) {
     connectionCallback_ = cb;
   }
   void setMessageCallback(const MessageCallback &cb) {
     messageCallback_ = cb;
+  }
+  void setWriteCompleteCallback(const WriteCompleteCallback &cb) {
+    writeCompleteCallback_ = cb;
   }
   void setCloseCallback(const CloseCallback &cb) {
     closeCallback_ = cb;
@@ -62,6 +66,7 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   InetAddress peerAddr_;
   ConnectionCallback connectionCallback_;
   MessageCallback messageCallback_;
+  WriteCompleteCallback writeCompleteCallback_;
   CloseCallback closeCallback_;
   Buffer inputBuffer_;
   Buffer outputBuffer_;

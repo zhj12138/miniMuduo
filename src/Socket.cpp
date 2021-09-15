@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <glog/logging.h>
+#include <netinet/tcp.h>
 
 using namespace mymuduo;
 
@@ -39,4 +40,12 @@ void Socket::setReuseAddr(bool on) {
 
 void Socket::shutdownWrite() {
   sockets::shutdownWrite(sockfd_);
+}
+
+void Socket::setTcpNoDelay(bool on) {
+  int optval = on ? 1 : 0;
+  if (::setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval)) == -1) {
+    LOG(ERROR) << "setsockopt for sockfd: " << sockfd_ << " failed\n";
+    // TODO: specify through errno
+  }
 }

@@ -4,23 +4,21 @@
 #include <iostream>
 #include <unistd.h>
 
-std::string message1, message2;
-int sleepSeconds = 0;
+std::string message;
 
 void onConnection(const mymuduo::TcpConnectionPtr &conn) {
   if (conn->connected()) {
     std::cout << "onConnection: new connection [" << conn->name()
               << "] from " << conn->peerAddress().toHostPort() << "\n";
-    if (sleepSeconds > 0) {
-      ::sleep(sleepSeconds);
-    }
-    conn->send(message1);
-    conn->send(message2);
-    conn->shutdown();
+    conn->send(message);
   } else {
     std::cout << "onConnection: connection [" << conn->name()
               << "] is done\n";
   }
+}
+
+void onWriteComplete(const mymuduo::TcpConnectionPtr &conn) {
+  conn->send(message);
 }
 
 void onMessage(const mymuduo::TcpConnectionPtr &conn,
@@ -35,23 +33,21 @@ void onMessage(const mymuduo::TcpConnectionPtr &conn,
 int main(int argc, char *argv[]) {
   std::cout << "main(): pid = %d\n" << getpid();
 
-  int len1 = 100, len2 = 100;
-  if (argc > 2) {
-    len1 = atoi(argv[1]);
-    len2 = atoi(argv[2]);
+  std::string line;
+  for (int i = 33; i < 127; ++i) {
+    line.push_back(char(i));
   }
-  message1.resize(len1);
-  message2.resize(len2);
-  std::fill(message1.begin(), message1.end(), 'A');
-  std::fill(message2.begin(), message2.end(), 'B');
-  if (argc > 3) {
-    sleepSeconds = atoi(argv[3]);
+  line += line;
+
+  for (size_t i = 0; i < 127 - 33; ++i) {
+    message += line.substr(i, 72) + '\n';
   }
 
   mymuduo::InetAddress listenAddr(9987);
   mymuduo::EventLoop loop;
   mymuduo::TcpServer server(&loop, listenAddr);
   server.setConnectionCallback(onConnection);
+  server.setWriteCompleteCallback(onWriteComplete);
   server.setMessageCallback(onMessage);
   server.start();
   loop.loop();

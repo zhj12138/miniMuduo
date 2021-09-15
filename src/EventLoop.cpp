@@ -7,6 +7,7 @@
 #include <glog/logging.h>
 #include <cassert>
 #include <poll.h>
+#include <csignal>
 #include <sys/eventfd.h>
 
 using namespace mymuduo;
@@ -22,6 +23,15 @@ static int createEventfd() {
   }
   return evtfd;
 }
+
+class IgnoreSigPipe {
+ public:
+  IgnoreSigPipe() {
+    ::signal(SIGPIPE, SIG_IGN);
+  }
+};
+
+IgnoreSigPipe initObj;
 
 EventLoop::EventLoop()
     : looping_(false),

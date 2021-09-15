@@ -79,3 +79,6 @@ target_link_libraries(test9 myMuduo)
 
 add_executable(test10 tests/test10.cpp)
 target_link_libraries(test10 myMuduo)
+
+add_executable(test11 tests/test11.cpp)
+target_link_libraries(test11 myMuduo)
