@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(myMuduo)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-pthread")
 
 find_package(glog 0.6.0 REQUIRED)
@@ -50,10 +50,14 @@ add_library(myMuduo
         src/Connector.hpp
         src/TcpClient.cpp
         src/TcpClient.hpp
-        )
+        src/http/HttpContext.cpp
+        src/http/HttpResponse.cpp
+        src/http/HttpResponse.hpp src/http/HttpServer.cpp src/http/HttpServer.hpp)
 target_link_libraries(myMuduo glog::glog)
 
 include_directories(src)
+
+# Tests
 
 add_executable(test1 tests/test1.cpp)
 target_link_libraries(test1 myMuduo)

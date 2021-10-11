@@ -6,6 +6,8 @@
 #include "noncopyable.hpp"
 #include "Buffer.hpp"
 
+#include <any>
+
 namespace mymuduo {
 
 class Channel;
@@ -25,11 +27,20 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   const std::string &name() const { return name_; }
   const InetAddress &localAddress() { return localAddr_; }
   const InetAddress &peerAddress() { return peerAddr_; }
-  bool connected() const  { return state_ == kConnected; }
+  bool connected() const { return state_ == kConnected; }
+  bool disconnected() const { return state_ == kDisconnected; }
 
   void send(const std::string &message);
+  void send(Buffer *buf);
   void shutdown();
   void setTcpNoDelay(bool on);
+
+  void setContext(const std::any &context) {
+    context_ = context;
+  }
+  std::any *getMutableContext() {
+    return &context_;
+  }
 
   void setConnectionCallback(const ConnectionCallback &cb) {
     connectionCallback_ = cb;
@@ -43,6 +54,9 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   void setCloseCallback(const CloseCallback &cb) {
     closeCallback_ = cb;
   }
+  void setHighWaterMarkCallback(const HighWaterMarkCallback &cb) {
+    highWaterMarkCallback_ = cb;
+  }
   void connectEstablished();  // should be called only once
   void connectDestroyed();
  private:
@@ -55,6 +69,7 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   void handleError();
 
   void sendInLoop(const std::string &message);
+  void sendInLoop(const void *message, size_t len);
   void shutdownInLoop();
 
   EventLoop *loop_;
@@ -68,9 +83,15 @@ class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnec
   MessageCallback messageCallback_;
   WriteCompleteCallback writeCompleteCallback_;
   CloseCallback closeCallback_;
+  HighWaterMarkCallback highWaterMarkCallback_;
+  size_t highWaterMark_;
   Buffer inputBuffer_;
   Buffer outputBuffer_;
+  std::any context_;
 };
+
+void defaultConnectionCallback(const TcpConnectionPtr &conn);
+void defaultMessageCallback(const TcpConnectionPtr &, Buffer *buf, time_point);
 
 }
 #endif //MYMUDUO__TCPCONNECTION_HPP_

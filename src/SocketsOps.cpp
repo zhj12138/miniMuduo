@@ -176,3 +176,7 @@ bool sockets::isSelfConnect(int sockfd) {
   return localaddr.sin_port == peeraddr.sin_port &&
       localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
 }
+
+ssize_t sockets::write(int sockfd, const void *buf, size_t count) {
+  return ::write(sockfd, buf, count);
+}

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <cstring>
 
 namespace mymuduo {
 
@@ -39,6 +40,27 @@ class Buffer {
       makeSpace(len);
     }
     assert(writeableBytes() >= len);
+  }
+
+  const char *findCRLF() const {
+    const char *crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF + 2);
+    return crlf == beginWrite() ? nullptr : crlf;
+  }
+  const char *findCRLF(const char *start) const {
+    assert(peek() <= start);
+    assert(start <= beginWrite());
+    const char *crlf = std::search(start, beginWrite(), kCRLF, kCRLF + 2);
+    return crlf == beginWrite() ? nullptr : crlf;
+  }
+  const char *findEOL() const {
+    const void *eol = memchr(peek(), '\n', readableBytes());
+    return static_cast<const char *>(eol);
+  }
+  const char *findEOL(const char *start) const {
+    assert(peek() <= start);
+    assert(start <= beginWrite());
+    const void *eol = memchr(start, '\n', beginWrite() - start);
+    return static_cast<const char *>(eol);
   }
 
   void retrieve(size_t len) {
@@ -101,6 +123,8 @@ class Buffer {
   std::vector<char> buffer_;
   size_t readerIndex_;
   size_t writerIndex_;
+
+  static const char kCRLF[];
 };
 
 }

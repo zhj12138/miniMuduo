@@ -6,6 +6,7 @@
 #include "noncopyable.hpp"
 
 #include <map>
+#include <atomic>
 
 namespace mymuduo {
 
@@ -15,10 +16,25 @@ class EventLoopThreadPool;
 
 class TcpServer : noncopyable {
  public:
-  TcpServer(EventLoop *loop, const InetAddress &listenAddr);
+  using ThreadInitCallback = std::function<void(EventLoop *)>;
+  enum Option {
+    kNoReusePort,
+    kReusePort,
+  };
+
+  TcpServer(EventLoop *loop,
+            const InetAddress &listenAddr,
+            std::string nameArg,
+            Option option = kNoReusePort);
   ~TcpServer();
 
+  const std::string &ipPort() const { return ipPort_; }
+  const std::string &name() const { return name_; }
+  EventLoop *getLoop() const { return loop_; }
+
   void setThreadNum(int numThreads);
+  void setThreadInitCallback(const ThreadInitCallback &cb) { threadInitCallback_ = cb; }
+  std::shared_ptr<EventLoopThreadPool> threadPool() { return threadPool_; }
 
   void start();
 
@@ -40,13 +56,15 @@ class TcpServer : noncopyable {
   using ConnectionMap = std::map<std::string, TcpConnectionPtr>;
 
   EventLoop *loop_;
+  const std::string ipPort_;
   const std::string name_;
   std::unique_ptr<Acceptor> acceptor_;
-  std::unique_ptr<EventLoopThreadPool> threadPool_;
+  std::shared_ptr<EventLoopThreadPool> threadPool_;
   ConnectionCallback connectionCallback_;
   MessageCallback messageCallback_;
   WriteCompleteCallback writeCompleteCallback_;
-  bool started_;
+  ThreadInitCallback threadInitCallback_;
+  std::atomic<bool> started_{false};
   int nextConnId_;
   ConnectionMap connections_;
 };

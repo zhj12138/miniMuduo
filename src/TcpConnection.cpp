@@ -12,6 +12,15 @@
 
 using namespace mymuduo;
 
+void defaultConnectionCallback(const TcpConnectionPtr &conn) {
+  LOG(INFO) << conn->localAddress().toHostPort() << " -> "
+            << conn->peerAddress().toHostPort() << " is "
+            << (conn->connected() ? "UP" : "DOWN");
+}
+void defaultMessageCallback(const TcpConnectionPtr &, Buffer *buf, time_point) {
+  buf->retrieveAll();
+}
+
 TcpConnection::TcpConnection(EventLoop *loop,
                              std::string name,
                              int sockfd,
@@ -160,5 +169,57 @@ void TcpConnection::shutdownInLoop() {
   loop_->assertInLoopThread();
   if (!channel_->isWriting()) {
     socket_->shutdownWrite();
+  }
+}
+
+void TcpConnection::send(Buffer *buf) {
+  if (state_ == kConnected) {
+    if (loop_->isInLoopThread()) {
+      sendInLoop(buf->peek(), buf->readableBytes());
+      buf->retrieveAll();
+    } else {
+      // TODO
+    }
+  }
+}
+
+void TcpConnection::sendInLoop(const void *data, size_t len) {
+  loop_->assertInLoopThread();
+  ssize_t nwrote = 0;
+  size_t remaining = len;
+  bool faultError = false;
+  if (state_ == kDisconnected) {
+    LOG(WARNING) << "disconnected, give up writing";
+    return;
+  }
+  if (!channel_->isWriting() && outputBuffer_.readableBytes() == 0) {
+    nwrote = sockets::write(channel_->fd(), data, len);
+    if (nwrote >= 0) {
+      remaining = len - nwrote;
+      if (remaining == 0 && writeCompleteCallback_) {
+        loop_->queueInLoop(std::bind(writeCompleteCallback_, shared_from_this()));
+      }
+    } else {
+      nwrote = 0;
+      if (errno != EWOULDBLOCK) {
+        LOG(ERROR) << "TcpConnection::sendInLoop";
+        if (errno == EPIPE || errno == ECONNRESET) {
+          faultError = true;
+        }
+      }
+    }
+  }
+  assert(remaining <= len);
+  if (!faultError && remaining > 0) {
+    size_t oldLen = outputBuffer_.readableBytes();
+    if (oldLen + remaining >= highWaterMark_ &&
+        oldLen < highWaterMark_ &&
+        highWaterMarkCallback_) {
+      loop_->queueInLoop(std::bind(highWaterMarkCallback_, shared_from_this(), oldLen + remaining));
+    }
+    outputBuffer_.append(static_cast<const char *>(data) + nwrote, remaining);
+    if (!channel_->isWriting()) {
+      channel_->enableWriting();
+    }
   }
 }

@@ -11,12 +11,16 @@
 
 using namespace mymuduo;
 
-TcpServer::TcpServer(EventLoop *loop, const InetAddress &listenAddr)
+TcpServer::TcpServer(EventLoop *loop, const InetAddress &listenAddr,
+                     std::string nameArg,
+                     Option option)
     : loop_(loop),
-      name_(listenAddr.toHostPort()),
+      ipPort_(listenAddr.toHostPort()),
+      name_(std::move(nameArg)),
       acceptor_(new Acceptor(loop, listenAddr)),
       threadPool_(new EventLoopThreadPool(loop)),
-      started_(false),
+      connectionCallback_(defaultConnectionCallback),
+      messageCallback_(defaultMessageCallback),
       nextConnId_(1) {
   if (loop == nullptr) {
     LOG(FATAL) << "loop is nullptr\n";
@@ -35,11 +39,9 @@ void TcpServer::setThreadNum(int numThreads) {
 }
 
 void TcpServer::start() {
-  if (!started_) {
-    started_ = true;
+  if (!started_.exchange(true)) {
     threadPool_->start();
-  }
-  if (!acceptor_->listenning()) {
+    assert(!acceptor_->listenning());
     loop_->runInLoop([capture0 = acceptor_.get()] { capture0->listen(); });
   }
 }

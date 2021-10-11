@@ -52,6 +52,8 @@ struct sockaddr_in getPeerAddr(int sockfd);
 int getSocketError(int sockfd);
 bool isSelfConnect(int sockfd);
 
+ssize_t write(int sockfd, const void *buf, size_t count);
+
 }
 
 }
