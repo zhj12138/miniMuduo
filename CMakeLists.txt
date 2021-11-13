@@ -52,7 +52,9 @@ add_library(myMuduo
         src/TcpClient.hpp
         src/http/HttpContext.cpp
         src/http/HttpResponse.cpp
-        src/http/HttpResponse.hpp src/http/HttpServer.cpp src/http/HttpServer.hpp)
+        src/http/HttpResponse.hpp
+        src/http/HttpServer.cpp
+        src/http/HttpServer.hpp)
 target_link_libraries(myMuduo glog::glog)
 
 include_directories(src)

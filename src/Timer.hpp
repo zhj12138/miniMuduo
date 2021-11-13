@@ -29,11 +29,11 @@ class Timer : noncopyable {
   void restart(time_point now);
 
  private:
-  const TimerCallback callback_;
-  time_point expiration_;
-  const double interval_;
-  const bool repeat_;
-  const int64_t sequence_;
+  const TimerCallback callback_;  // 回调函数
+  time_point expiration_; // 过期时间
+  const double interval_; // 重复的时间间隔
+  const bool repeat_;     // 是否重复
+  const int64_t sequence_;// 代表第sequence_个创建的Timer
 
   static std::atomic<int64_t> s_numCreated_;
 };

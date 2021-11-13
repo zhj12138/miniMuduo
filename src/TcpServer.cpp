@@ -42,7 +42,7 @@ void TcpServer::start() {
   if (!started_.exchange(true)) {
     threadPool_->start();
     assert(!acceptor_->listenning());
-    loop_->runInLoop([capture0 = acceptor_.get()] { capture0->listen(); });
+    loop_->runInLoop([acceptor = acceptor_.get()] { acceptor->listen(); });
   }
 }
 
@@ -56,8 +56,8 @@ void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
             << "] - new connection [" << connName
             << "] from " << peerAddr.toHostPort();
   InetAddress localAddr(sockets::getLocalAddr(sockfd));
-  EventLoop *ioLoop = threadPool_->getNextLoop();
-  TcpConnectionPtr conn(new TcpConnection(ioLoop, connName, sockfd, localAddr, peerAddr));
+  EventLoop *ioLoop = threadPool_->getNextLoop(); // 获取下一个EventLoop
+  TcpConnectionPtr conn(new TcpConnection(ioLoop, connName, sockfd, localAddr, peerAddr));  // 创建一个新的TcpConnection对象
   connections_[connName] = conn;
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);

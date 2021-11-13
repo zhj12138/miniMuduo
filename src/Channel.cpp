@@ -31,31 +31,29 @@ void Channel::update() {
 
 void Channel::handleEvent(time_point receiveTime) {
   eventHandling_ = true;
-  if (revents_ & POLLNVAL) {
+  if (revents_ & POLLNVAL) {  // 文件描述符未打开
     LOG(WARNING) << "Channel::handle_event() POLLNVAL";
   }
-  if ((revents_ & POLLHUP) && !(revents_ & POLLIN)) {
+  if ((revents_ & POLLHUP) && !(revents_ & POLLIN)) { // 出现挂断
     LOG(WARNING) << "Channel::handle_event() POLLHUP";
     if (closeCallback_) {
       closeCallback_();
     }
   }
-  if (revents_ & (POLLERR | POLLNVAL)) {
+  if (revents_ & (POLLERR | POLLNVAL)) { // 出现错误
     if (errorCallback_) {
       errorCallback_();
     }
   }
-  if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
+  if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {  // 数据可读
     if (readCallback_) {
       readCallback_(receiveTime);
     }
   }
-  if (revents_ & POLLOUT) {
+  if (revents_ & POLLOUT) { // 数据可写
     if (writeCallback_) {
       writeCallback_();
     }
   }
   eventHandling_ = false;
 }
-
-

@@ -13,6 +13,7 @@
 
 using namespace mymuduo;
 
+/* 一个线程一个EventLoop */
 thread_local EventLoop *t_loopInThisThread = nullptr;
 const int kPollTimeMs = 10000;
 
@@ -72,7 +73,7 @@ void EventLoop::loop() {
     for (const auto &channel: activeChannels_) {
       channel->handleEvent(pollReturnTime_);
     }
-    doPendingFunctors();
+    doPendingFunctors();  // 调用pending functions
   }
 
   LOG(INFO) << "EventLoop " << this << " stop looping";
@@ -87,10 +88,10 @@ void EventLoop::quit() {
 }
 
 void EventLoop::runInLoop(const Functor &cb) {
-  if (isInLoopThread()) {
-    cb();
-  } else {
-    queueInLoop(cb);
+  if (isInLoopThread()) { // 在当前IO线程中调用runInLoop
+    cb(); // 同步调用该函数
+  } else {  // 在其他线程中调用runInLoop
+    queueInLoop(cb);  // 将cb加入到EventLoop的pending functions中，然后尝试唤醒该EventLoop对象
   }
 }
 

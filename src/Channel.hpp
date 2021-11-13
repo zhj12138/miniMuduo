@@ -70,7 +70,7 @@ class Channel : noncopyable {
   const int fd_;
   int events_;
   int revents_;
-  int index_;
+  int index_; // 当前Channel在Poller中的Channel数组中的下标
 
   bool eventHandling_;
 

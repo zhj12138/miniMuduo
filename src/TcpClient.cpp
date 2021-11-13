@@ -87,11 +87,7 @@ void TcpClient::newConnection(int sockfd) {
   std::string connName = buf;
 
   InetAddress localAddr(sockets::getLocalAddr(sockfd));
-  TcpConnectionPtr conn(new TcpConnection(loop_,
-                                          connName,
-                                          sockfd,
-                                          localAddr,
-                                          peerAddr));
+  TcpConnectionPtr conn(new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr));
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
   conn->setWriteCompleteCallback(writeCompleteCallback_);

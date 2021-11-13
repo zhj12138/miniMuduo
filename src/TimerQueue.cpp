@@ -111,18 +111,18 @@ void TimerQueue::cancelInLoop(TimerId timerId) {
 void TimerQueue::handleRead(time_point _receiveTime) {
   loop_->assertInLoopThread();
   time_point now(get_now());
-  readTimerfd(timerfd_, now);
+  readTimerfd(timerfd_, now); // 读取timerfd的数据
 
-  EntryVec expired = getExpired(now);
+  EntryVec expired = getExpired(now); // 获取所有过期的Timer
 
   callingExpiredTimers_ = true;
   cancelingTimers_.clear();
   for (auto &entry : expired) {
-    entry.second->run();
+    entry.second->run();  // 调用Timer的回调函数
   }
   callingExpiredTimers_ = false;
 
-  reset(expired, now);
+  reset(expired, now);  // 重启重复的Timer, 更新下次过期的时间(内部通过timerfd_settime来实现)
 }
 
 TimerQueue::EntryVec TimerQueue::getExpired(time_point now) {
@@ -131,8 +131,8 @@ TimerQueue::EntryVec TimerQueue::getExpired(time_point now) {
   Entry sentry = std::make_pair(now, reinterpret_cast<Timer *>(UINTPTR_MAX));
   auto it = timers_.lower_bound(sentry);
   assert(it == timers_.end() || now < it->first);
-  std::copy(timers_.begin(), it, std::back_inserter(expired));
-  timers_.erase(timers_.begin(), it);
+  std::copy(timers_.begin(), it, std::back_inserter(expired));  // 填充expired数组
+  timers_.erase(timers_.begin(), it); // 删去过期的Timer
 
   for (auto entry: expired) {
     ActiveTimer timer(entry.second, entry.second->sequence());
@@ -150,8 +150,8 @@ void TimerQueue::reset(const std::vector<Entry> &expired, time_point now) {
   for (auto &ex: expired) {
     ActiveTimer timer(ex.second, ex.second->sequence());
     if (ex.second->repeat() &&
-        cancelingTimers_.find(timer) == cancelingTimers_.end()) {
-      ex.second->restart(now);
+        cancelingTimers_.find(timer) == cancelingTimers_.end()) { // 是一个重复的Timer，并且没有被cancel
+      ex.second->restart(now);  // 重启Timer
       insert(ex.second);
     } else {
       delete ex.second;

@@ -157,7 +157,7 @@ void TcpConnection::sendInLoop(const std::string &message) {
     }
   }
   assert(nwrote >= 0);
-  if (implicit_cast<size_t>(nwrote) < message.size()) {
+  if (implicit_cast<size_t>(nwrote) < message.size()) { // 还没有发送完，放到outputBuffer中
     outputBuffer_.append(message.data() + nwrote, message.size() - nwrote);
     if (!channel_->isWriting()) {
       channel_->enableWriting();

@@ -125,7 +125,7 @@ void Connector::handleWrite() {
       LOG(WARNING) << "Connector::handleWrite - SO_ERROR = "
                    << err << " " << strerror(err);
       retry(sockfd);
-    } else if (sockets::isSelfConnect(sockfd)) {
+    } else if (sockets::isSelfConnect(sockfd)) {  // 自连接
       LOG(WARNING) << "Connector::handleWrite = Self Connect";
       retry(sockfd);
     } else {
