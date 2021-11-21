@@ -4,6 +4,94 @@
 
 miniMuduo是一个模仿muduo的简单网络库，基于Reactor模式。
 
+## 性能测试
+
+使用apache benchmark进行测试：
+
+```sh
+ab -n 100000 -c 100 -k 127.0.0.1:9987/
+```
+
+### miniMuduo
+
+使用miniMuduo编写的[echo_server](benchmark/mini_muduo_echo_server.cpp)的测试结果如下：
+
+```sh
+Concurrency Level:      100
+Time taken for tests:   12.460 seconds
+Complete requests:      100000
+Failed requests:        0
+Non-2xx responses:      100000
+Keep-Alive requests:    100000
+Total transferred:      10600000 bytes
+HTML transferred:       0 bytes
+Requests per second:    8025.68 [#/sec] (mean)
+Time per request:       12.460 [ms] (mean)
+Time per request:       0.125 [ms] (mean, across all concurrent requests)
+Transfer rate:          830.78 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   1.5      0      74
+Processing:     3   12   4.3     11      75
+Waiting:        1   12   4.2     11      46
+Total:          3   12   4.5     11      84
+
+Percentage of the requests served within a certain time (ms)
+  50%     11
+  66%     12
+  75%     14
+  80%     15
+  90%     19
+  95%     22
+  98%     24
+  99%     26
+ 100%     84 (longest request)
+```
+
+### Boost.asio
+
+使用Boost.asio编写的[echo_server](benchmark/asio_echo_server.cpp)的测试结果如下：
+
+```sh
+Concurrency Level:      100
+Time taken for tests:   10.676 seconds
+Complete requests:      100000
+Failed requests:        0
+Non-2xx responses:      100000
+Keep-Alive requests:    100000
+Total transferred:      10600000 bytes
+HTML transferred:       0 bytes
+Requests per second:    9366.48 [#/sec] (mean)
+Time per request:       10.676 [ms] (mean)
+Time per request:       0.107 [ms] (mean, across all concurrent requests)
+Transfer rate:          969.58 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   1.1      0      56
+Processing:     3   11   2.1     11      56
+Waiting:        0   11   2.1     10      27
+Total:          3   11   2.4     11      66
+
+Percentage of the requests served within a certain time (ms)
+  50%     11
+  66%     11
+  75%     12
+  80%     12
+  90%     13
+  95%     14
+  98%     16
+  99%     17
+ 100%     66 (longest request)
+```
+
+### 性能分析
+
+我估计miniMuduo比asio性能低的一个原因是日志。
+
+miniMuduo每次接收到连接，接受到消息都会打印日志信息，而且并没有采用异步写日志。
+
 ## 核心类
 
 ### EventLoop

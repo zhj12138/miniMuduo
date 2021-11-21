@@ -59,46 +59,29 @@ target_link_libraries(myMuduo glog::glog)
 
 include_directories(src)
 
+macro(add_muduo_executable target_name source_file)
+    add_executable(${target_name} ${source_file})
+    target_link_libraries(${target_name} myMuduo)
+endmacro()
+
+link_libraries(myMuduo)
+
 # Tests
+add_muduo_executable(test1 tests/test1.cpp)
+add_muduo_executable(test2 tests/test2.cpp)
+add_muduo_executable(test3 tests/test3.cpp)
+add_muduo_executable(test4 tests/test4.cpp)
+add_muduo_executable(test5 tests/test5.cpp)
+add_muduo_executable(test6 tests/test6.cpp)
+add_muduo_executable(test7 tests/test7.cpp)
+add_muduo_executable(test8 tests/test8.cpp)
+add_muduo_executable(test9 tests/test9.cpp)
+add_muduo_executable(test10 tests/test10.cpp)
+add_muduo_executable(test11 tests/test11.cpp)
+add_muduo_executable(test12 tests/test12.cpp)
+add_muduo_executable(test13 tests/test13.cpp)
 
-add_executable(test1 tests/test1.cpp)
-target_link_libraries(test1 myMuduo)
+# benchmark
+add_muduo_executable(mini_muduo_echo_server benchmark/mini_muduo_echo_server.cpp)
 
-add_executable(test2 tests/test2.cpp)
-target_link_libraries(test2 myMuduo)
-
-add_executable(test3 tests/test3.cpp)
-target_link_libraries(test3 myMuduo)
-
-add_executable(test4 tests/test4.cpp)
-target_link_libraries(test4 myMuduo)
-
-add_executable(testThread tests/testThread.cpp src/TimeUtil.cpp)
-target_link_libraries(testThread pthread)
-
-add_executable(test5 tests/test5.cpp)
-target_link_libraries(test5 myMuduo)
-
-add_executable(test6 tests/test6.cpp)
-target_link_libraries(test6 myMuduo)
-
-add_executable(test7 tests/test7.cpp)
-target_link_libraries(test7 myMuduo)
-
-add_executable(test8 tests/test8.cpp)
-target_link_libraries(test8 myMuduo)
-
-add_executable(test9 tests/test9.cpp)
-target_link_libraries(test9 myMuduo)
-
-add_executable(test10 tests/test10.cpp)
-target_link_libraries(test10 myMuduo)
-
-add_executable(test11 tests/test11.cpp)
-target_link_libraries(test11 myMuduo)
-
-add_executable(test12 tests/test12.cpp)
-target_link_libraries(test12 myMuduo)
-
-add_executable(test13 tests/test13.cpp)
-target_link_libraries(test13 myMuduo)
+add_executable(asio_echo_server benchmark/asio_echo_server.cpp)

@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   std::cout << "main(): pid = " << getpid() << "\n";
   mymuduo::InetAddress listenAddr(9987);
   mymuduo::EventLoop loop;
-  mymuduo::TcpServer server(&loop, listenAddr);
+  mymuduo::TcpServer server(&loop, listenAddr, "server");
   server.setConnectionCallback(onConnection);
   server.setMessageCallback(onMessage);
   if (argc > 1) {

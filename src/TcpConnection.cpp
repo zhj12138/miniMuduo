@@ -12,12 +12,12 @@
 
 using namespace mymuduo;
 
-void defaultConnectionCallback(const TcpConnectionPtr &conn) {
+void mymuduo::defaultConnectionCallback(const TcpConnectionPtr &conn) {
   LOG(INFO) << conn->localAddress().toHostPort() << " -> "
             << conn->peerAddress().toHostPort() << " is "
             << (conn->connected() ? "UP" : "DOWN");
 }
-void defaultMessageCallback(const TcpConnectionPtr &, Buffer *buf, time_point) {
+void mymuduo::defaultMessageCallback(const TcpConnectionPtr &, Buffer *buf, time_point) {
   buf->retrieveAll();
 }
 
