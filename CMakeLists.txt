@@ -80,6 +80,7 @@ add_muduo_executable(test10 tests/test10.cpp)
 add_muduo_executable(test11 tests/test11.cpp)
 add_muduo_executable(test12 tests/test12.cpp)
 add_muduo_executable(test13 tests/test13.cpp)
+add_muduo_executable(test14 tests/test14.cpp)
 
 # benchmark
 add_muduo_executable(mini_muduo_echo_server benchmark/mini_muduo_echo_server.cpp)

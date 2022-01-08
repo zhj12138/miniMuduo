@@ -6,6 +6,8 @@
 
 using namespace mymuduo;
 
+const char Buffer::kCRLF[] = "\r\n";
+
 void Buffer::makeSpace(size_t len) {
   if (writeableBytes() + prependableBytes() < len + kCheapPrepend) {
     buffer_.resize(writerIndex_ + len);
